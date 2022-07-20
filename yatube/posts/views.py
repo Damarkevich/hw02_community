@@ -1,14 +1,12 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Group, Post
+AMOUNT_OF_POSTS = 10
 
 
 def index(request):
-    posts = Post.objects.all()[:10]
-    # Так и не сообразил, как тут можно сделать изящнее.
-    # И вот это '.all()[:10]' меня смущает.
-    # Сначала берем всё, а потом из него только 10 первых.
-    # Попытался сделать .range(10), но интерпретатор ругается.
-    # В Meta class тоже такого среза не нашел.
+    posts = Post.objects.all()[:AMOUNT_OF_POSTS]
+    # Как я понял, здесь нам select_related не понадобится,
+    # так как это простой запрос ко всем объектам класса Post.
     context = {
         'posts': posts,
         'title': 'Последние обновления на сайте',
@@ -18,7 +16,9 @@ def index(request):
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    posts = group.group_posts.all()[:10]
+    posts = group.group_posts.select_related('group')[:AMOUNT_OF_POSTS]
+    # А здесь я использовал select_related чтобы интерпретатор не
+    # перебирал все посты.
     context = {
         'group': group,
         'posts': posts,

@@ -22,6 +22,11 @@ class Post(models.Model):
         null=True,
         on_delete=models.SET_NULL,
         related_name='group_posts',
+        # Ниже в модели authors у меня тоже было related_name='posts'
+        # Понимаю, что даже если они будут одинаковые,
+        # тоже всё будет работать.
+        # Но мне показалось, что так не красиво.
+        # Если так не принято - с удовольствием исправлю.
     )
 
     author = models.ForeignKey(
