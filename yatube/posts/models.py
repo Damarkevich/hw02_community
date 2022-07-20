@@ -29,7 +29,7 @@ class Post(models.Model):
         on_delete=models.CASCADE,
         related_name='author_posts',
     )
-    
+
     class Meta:
         ordering = ['-pub_date']
         verbose_name_plural = 'Posts'
