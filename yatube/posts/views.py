@@ -5,8 +5,6 @@ AMOUNT_OF_POSTS = 10
 
 def index(request):
     posts = Post.objects.all()[:AMOUNT_OF_POSTS]
-    # Как я понял, здесь нам select_related не понадобится,
-    # так как это простой запрос ко всем объектам класса Post.
     context = {
         'posts': posts,
         'title': 'Последние обновления на сайте',
@@ -16,9 +14,7 @@ def index(request):
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    posts = group.group_posts.select_related('group')[:AMOUNT_OF_POSTS]
-    # А здесь я использовал select_related чтобы интерпретатор не
-    # перебирал все посты.
+    posts = group.posts.select_related('group')[:AMOUNT_OF_POSTS]
     context = {
         'group': group,
         'posts': posts,
