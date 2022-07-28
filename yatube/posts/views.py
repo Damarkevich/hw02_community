@@ -1,23 +1,31 @@
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from .models import Group, Post
 AMOUNT_OF_POSTS = 10
 
 
 def index(request):
-    posts = Post.objects.all()[:AMOUNT_OF_POSTS]
+    post_list = Post.objects.all()
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     context = {
-        'posts': posts,
-        'title': 'Последние обновления на сайте',
+        'page_obj': page_obj,
     }
     return render(request, 'posts/index.html', context)
 
 
+@login_required
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    posts = group.posts.select_related('group')[:AMOUNT_OF_POSTS]
+    post_list = group.posts.select_related('group')
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     context = {
         'group': group,
-        'posts': posts,
+        'page_obj': page_obj,
         'title': (f'Записи сообщества {group}'),
     }
     return render(request, 'posts/group_list.html', context)
