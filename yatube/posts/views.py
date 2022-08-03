@@ -1,6 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from multiprocessing import context
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from .forms import PostForm
 from .models import Group, Post, User
 AMOUNT_OF_POSTS = 10
 AMOUNT_SYMBOLS_TITLE = 30
@@ -17,7 +21,6 @@ def index(request):
     return render(request, 'posts/index.html', context)
 
 
-@login_required
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     post_list = group.posts.select_related('group')
@@ -63,3 +66,35 @@ def post_detail(request, post_id):
         'author_post_count': author_post_count,
     }
     return render(request, 'posts/post_detail.html', context)
+
+
+@login_required
+def post_create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('posts:profile', post.author)
+    form = PostForm()
+    return render(request, 'posts/create_post.html', {'form': form})
+
+
+@login_required
+def post_edit(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    if post.author != request.user:
+        return redirect('posts:post_detail', post_id)
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.save()
+            return redirect('posts:profile', post.author)
+    form = PostForm(instance=post)
+    context = {
+        'is_edit': True,
+        'form': form
+        }
+    return render(request, 'posts/create_post.html', context)
