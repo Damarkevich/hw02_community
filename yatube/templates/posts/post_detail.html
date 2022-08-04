@@ -10,7 +10,7 @@
 
             {% if post.group %}   
             <li class="list-group-item">
-              Группа: {{ post.group.name }}
+              Группа: {{ post.group }}
               <a href="{% url 'posts:group_list' post.group.slug %}">
                 все записи группы
               </a>
@@ -20,7 +20,7 @@
               Автор: {{ author }}
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center">
-              Всего постов автора:  {{ author_post_count }}
+              Всего постов автора:  <span>{{ author_post_count }}</span>
             </li>
             <li class="list-group-item">
               <a href="{% url 'posts:profile' post.author %}">
@@ -31,6 +31,11 @@
         </aside>
         <article class="col-12 col-md-9">
           <p>{{ post.text }}</p>
+          {% if user == post.author %}
+          <a class="btn btn-primary" href="{% url 'posts:post_edit' post.pk %}">
+            редактировать запись
+          </a>    
+          {% endif %}
         </article>
       </div> 
 </div> 

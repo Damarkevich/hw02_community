@@ -20,9 +20,11 @@
               </div>
               <div class="card-body">        
                 <form method="post"
-                {% if action_url %}
-                  action="{% url action_url %}"
-                {% endif %}
+                  {% if is_edit %}
+                    action="{% url 'posts:post_edit' post_id %}"
+                  {% else %}
+                    action="{% url 'posts:post_create' %}"
+                  {% endif %}
                 >
                   {% csrf_token %}
                   <div class="form-group row my-3 p-3">
@@ -30,8 +32,7 @@
                       Текст поста                  
                       <span class="required text-danger" >*</span>                  
                     </label>
-                    <textarea name="text" cols="40" rows="10" class="form-control" required id="id_text">
-                    </textarea>                
+                    {{ form.text }}              
                     <small id="id_text-help" class="form-text text-muted">
                       {% if is_edit %}
                       Отредактированный пост
@@ -44,11 +45,7 @@
                     <label for="id_group">
                       Группа                  
                     </label>
-                    <select name="group" class="form-control" id="id_group">
-                      <option value="" selected>---------</option>
-                      <option value="1">Группа: Котики</option>
-                      <option value="2">Группа: Собакены</option>
-                    </select>
+                    {{ form.group }}
                     <small id="id_group-help" class="form-text text-muted">
                       Группа, к которой будет относиться пост
                     </small>
